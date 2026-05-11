@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>SharePoint Debug</title>
+<script src="https://unpkg.com/@azure/msal-browser@2.38.3/lib/msal-browser.min.js"></script>
+<style>
+  body { font-family: monospace; padding: 20px; background: #1a1a2e; color: #00ff88; }
+  button { background: #cc0000; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 6px; font-size: 14px; margin: 5px; }
+  pre { background: #0d0d1a; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 12px; white-space: pre-wrap; }
+  .error { color: #ff4444; }
+  .success { color: #00ff88; }
+  h3 { color: white; }
+</style>
+</head>
+<body>
+<h3>SharePoint Debug Tool — MWP</h3>
+<button onclick="runDebug()">🔍 Login & Debug SharePoint</button>
+<div id="output"></div>
+
+<script>
+const MSAL_CONFIG = {
+  auth: {
+    clientId: 'c01bc44e-d012-4cf3-834a-84c009ca57f6',
+    authority: 'https://login.microsoftonline.com/4269d7fc-0328-453c-a4f2-db7282a63ae9',
+    redirectUri: 'https://mindworkproductions.github.io/evaluatieformulier/sp-debug.html'
+  }
+};
+
+function log(msg, cls = '') {
+  const el = document.getElementById('output');
+  el.innerHTML += `<pre class="${cls}">${msg}</pre>`;
+}
+
+async function runDebug() {
+  document.getElementById('output').innerHTML = '';
+  try {
+    const msalInstance = new msal.PublicClientApplication(MSAL_CONFIG);
+    await msalInstance.initialize();
+
+    const response = await msalInstance.loginPopup({
+      scopes: ['Files.ReadWrite.All', 'Sites.ReadWrite.All', 'User.Read']
+    });
+    log(`✅ Ingelogd als: ${response.account.name}`, 'success');
+
+    const token = (await msalInstance.acquireTokenSilent({
+      scopes: ['Files.ReadWrite.All', 'Sites.ReadWrite.All'],
+      account: response.account
+    })).accessToken;
+
+    // Test 1: Site ophalen
+    log('--- Stap 1: Site ophalen ---');
+    const s1 = await fetch('https://graph.microsoft.com/v1.0/sites/mwp.sharepoint.com:/sites/office', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const d1 = await s1.json();
+    log(JSON.stringify(d1, null, 2), s1.ok ? 'success' : 'error');
+
+    if (!s1.ok) return;
+    const siteId = d1.id;
+
+    // Test 2: Drives ophalen
+    log('--- Stap 2: Drives ophalen ---');
+    const s2 = await fetch(`https://graph.microsoft.com/v1.0/sites/${siteId}/drives`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const d2 = await s2.json();
+    log(JSON.stringify(d2, null, 2), s2.ok ? 'success' : 'error');
+
+    if (!s2.ok) return;
+    const drives = d2.value;
+    const drive = drives.find(d => d.name === 'Documenten' || d.name === 'Documents' || d.name === 'Gedeelde documenten') || drives[0];
+    log(`✅ Gebruik drive: ${drive.name} (${drive.id})`, 'success');
+
+    // Test 3: Root items ophalen
+    log('--- Stap 3: Root mappen ophalen ---');
+    const s3 = await fetch(`https://graph.microsoft.com/v1.0/drives/${drive.id}/root/children`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const d3 = await s3.json();
+    log(JSON.stringify(d3.value?.map(i => i.name), null, 2), s3.ok ? 'success' : 'error');
+
+  } catch(e) {
+    log(`❌ Fout: ${e.message}`, 'error');
+    console.error(e);
+  }
+}
+</script>
+</body>
+</html>
