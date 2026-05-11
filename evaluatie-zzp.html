@@ -1008,11 +1008,11 @@ function clearSig(id) {
 
 // ---- ROL & SHAREPOINT ----
 const SHAREPOINT_SITE = 'mwp.sharepoint.com';
-const SHAREPOINT_SITE_ID = 'office';
+const SHAREPOINT_SITE_PATH = '/sites/office';
 const ROLE_PATHS = {
-  change_agent:   '/sites/office/Shared Documents/06 People/04. MWAcademy/05. Evaluaties Leveranciers/1. Change Agents/2026',
-  trainer:        '/sites/office/Shared Documents/06 People/04. MWAcademy/05. Evaluaties Leveranciers/2. Trainers/2026',
-  projectmanager: '/sites/office/Shared Documents/06 People/04. MWAcademy/05. Evaluaties Leveranciers/3. Projectmanagers/2026'
+  change_agent:   '/06 People/04. MWAcademy/05. Evaluaties Leveranciers/1. Change Agents/2026',
+  trainer:        '/06 People/04. MWAcademy/05. Evaluaties Leveranciers/2. Trainers/2026',
+  projectmanager: '/06 People/04. MWAcademy/05. Evaluaties Leveranciers/3. Projectmanagers/2026'
 };
 const ROLE_LABELS = {
   change_agent: 'Change Agents / 2026',
@@ -1111,9 +1111,25 @@ async function uploadToSharePoint() {
     const datum = document.getElementById('datum_evaluatie')?.value || new Date().toISOString().split('T')[0];
     const filename = `Leveranciersevaluatie_ZZP_${naam.replace(/[^a-zA-Z0-9_\-]/g,'_')}_${datum}.html`;
 
-    // Upload via Microsoft Graph — PUT naar de juiste map
+    // Stap 1: Haal de drive ID op voor de SharePoint site
+    const siteResp = await fetch(`https://graph.microsoft.com/v1.0/sites/${SHAREPOINT_SITE},${SHAREPOINT_SITE_PATH}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const siteData = await siteResp.json();
+    if (!siteResp.ok) throw new Error(siteData?.error?.message || 'Site niet gevonden');
+    const siteId = siteData.id;
+
+    // Stap 2: Haal de default drive op
+    const driveResp = await fetch(`https://graph.microsoft.com/v1.0/sites/${siteId}/drive`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const driveData = await driveResp.json();
+    if (!driveResp.ok) throw new Error(driveData?.error?.message || 'Drive niet gevonden');
+    const driveId = driveData.id;
+
+    // Stap 3: Upload het bestand via de drive
     const folderPath = ROLE_PATHS[selectedRole];
-    const uploadUrl = `https://graph.microsoft.com/v1.0/sites/${SHAREPOINT_SITE}:${folderPath}:/${encodeURIComponent(filename)}:/content`;
+    const uploadUrl = `https://graph.microsoft.com/v1.0/drives/${driveId}/root:${folderPath}/${encodeURIComponent(filename)}:/content`;
 
     const uploadResp = await fetch(uploadUrl, {
       method: 'PUT',
