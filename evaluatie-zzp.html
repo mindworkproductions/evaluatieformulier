@@ -747,15 +747,19 @@ const CHECKLIST = [
   { q: "Werkt de zzp'er exclusief voor MWP/MWI?", hint: "Gewenst antwoord: NEE. Exclusiviteit wijst op een arbeidsrelatie.", wantNee: true, hasZelf: false },
   { q: "Voldoet de zzp'er aan de 70%-norm met andere opdrachtgevers?", hint: "Gewenst antwoord: JA. Bewijsvoering via separate bijlage omzetverdeling.", wantJa: true, hasZelf: false },
   { q: "Was er voldoende vrijheid bij de uitvoering van de opdracht (inhoud & werkwijze)?", hint: "Gewenst antwoord: JA. Geen aanwijzingsbevoegdheid van MWP.", wantJa: true, hasZelf: false },
-  { q: "Heeft de zzp'er een opdracht laten uitvoeren door een ander (vervanging)?", hint: "Gewenst antwoord: JA. Dit bewijst zelfstandigheid.", wantJa: true, hasZelf: false },
+  { q: "Heeft de zzp'er een opdracht laten uitvoeren door een ander (vervanging)?", hint: "Gewenst antwoord: JA. Dit bewijst zelfstandigheid.", wantJa: true, hasZelf: false,
+    verbeteractie: "Zzp'er heeft nog geen vervanging geregeld. Afspraak: zzp'er regelt actief vervanging bij volgende opdracht." },
   { q: "Was deze vervanger zelf gekozen of door MWP aangedragen?", hint: "Gewenst antwoord: ZELF.", options: ['Zelf', 'Verplicht'], hasZelf: true },
   { q: "Is er onderhandeld over het tarief?", hint: "Gewenst antwoord: JA. Vastgelegd via de hoofdovereenkomst.", wantJa: true, hasZelf: false },
-  { q: "Heeft de zzp'er acquisitieactiviteiten uitgevoerd afgelopen jaar?", hint: "Gewenst antwoord: JA. Indien NEE: opnemen als verbeteractie.", wantJa: true, hasZelf: false },
-  { q: "Heeft de zzp'er zakelijke investeringen gedaan afgelopen jaar?", hint: "Gewenst antwoord: JA. Telefoon, laptop, website, etc.", wantJa: true, hasZelf: false },
+  { q: "Heeft de zzp'er acquisitieactiviteiten uitgevoerd afgelopen jaar?", hint: "Gewenst antwoord: JA. Indien NEE: opnemen als verbeteractie.", wantJa: true, hasZelf: false,
+    verbeteractie: "Zzp'er heeft afgelopen jaar geen acquisitieactiviteiten uitgevoerd. Afspraak: zzp'er toont bij volgende evaluatie aan minimaal 1 nieuwe opdracht of acquisitieactiviteit te hebben ondernomen." },
+  { q: "Heeft de zzp'er zakelijke investeringen gedaan afgelopen jaar?", hint: "Gewenst antwoord: JA. Telefoon, laptop, website, etc.", wantJa: true, hasZelf: false,
+    verbeteractie: "Zzp'er heeft geen aantoonbare zakelijke investeringen gedaan. Afspraak: zzp'er overlegt bij volgende evaluatie bewijs van zakelijke investering (bijv. laptop, website, cursus)." },
   { q: "Maakt de zzp'er gebruik van fiscale ondernemersfaciliteiten?", hint: "Gewenst antwoord: JA. Vanzelfsprekend als zzp'er.", wantJa: true, hasZelf: false },
   { q: "Wordt het inkomen aangemerkt als winst uit onderneming?", hint: "Gewenst antwoord: JA. Standaard als zzp'er.", wantJa: true, hasZelf: false },
   { q: "Is de zzp'er ingeschreven bij de Kamer van Koophandel?", hint: "Gewenst antwoord: JA. Basishygiëne.", wantJa: true, hasZelf: false },
-  { q: "Heeft de zzp'er een eigen website?", hint: "Gewenst antwoord: JA. Indien NEE: verbeteractie.", wantJa: true, hasZelf: false },
+  { q: "Heeft de zzp'er een eigen website?", hint: "Gewenst antwoord: JA. Indien NEE: verbeteractie.", wantJa: true, hasZelf: false,
+    verbeteractie: "Zzp'er heeft geen eigen website. Afspraak: zzp'er maakt een eigen website of LinkedIn-profiel aan als zichtbare ondernemerspresentatie." },
   { q: "Heeft de zzp'er een eigen logo?", hint: "Gewenst antwoord: JA. Indien NEE: verbeteractie.", wantJa: true, hasZelf: false },
   { q: "Heeft de zzp'er een lopende beroepsaansprakelijkheidsverzekering (BAV)?", hint: "Gewenst antwoord: JA. Kopie polis aanleveren. Indien NEE: verbeteractie.", wantJa: true, hasZelf: false },
 ];
@@ -826,6 +830,16 @@ function validateAndGo(targetSection) {
     // Stap 2: Checklist — alle vragen beantwoord?
     const unanswered = CHECKLIST.map((_, i) => i).filter(i => !answers[i]);
     if (unanswered.length > 0) errors.push(`Beantwoord alle vragen in de checklist (${unanswered.length} nog open)`);
+
+    // Deadlines verplicht bij verbeteracties
+    CHECKLIST.forEach((item, i) => {
+      if (!item.verbeteractie) return;
+      const isNegatief = (item.wantJa && answers[i] === 'nee') || (item.wantNee && answers[i] === 'ja');
+      if (isNegatief) {
+        const deadline = document.getElementById(`deadline-${i}`)?.value;
+        if (!deadline) errors.push(`Vul een deadline in voor verbeteractie bij vraag ${i+1}`);
+      }
+    });
   }
 
   if (current === 2) {
@@ -897,14 +911,60 @@ function setAnswer(idx, val, btn) {
   answers[idx] = val;
   const item = document.getElementById(`ci-${idx}`);
 
-  // Remove all selected classes from sibling buttons
-  item.querySelectorAll('.answer-btn').forEach(b => {
-    b.className = 'answer-btn';
-  });
+  item.querySelectorAll('.answer-btn').forEach(b => { b.className = 'answer-btn'; });
   btn.className = `answer-btn selected-${val}`;
-
-  // Color item
   item.className = `checklist-item answered-${val}`;
+
+  // Toon hint na het beantwoorden
+  const hint = document.getElementById(`hint-${idx}`);
+  if (hint) hint.style.display = 'block';
+
+  // Verbeteractie automatisch toevoegen bij NEE
+  const checkItem = CHECKLIST[idx];
+  const isNegatief = (checkItem.wantJa && val === 'nee') || (checkItem.wantNee && val === 'ja');
+
+  // Verwijder bestaand deadline-veld voor deze vraag
+  const existingDeadline = document.getElementById(`deadline-block-${idx}`);
+  if (existingDeadline) existingDeadline.remove();
+
+  if (isNegatief && checkItem.verbeteractie) {
+    // Voeg verbeteractie toe aan het tekstvak
+    const textarea = document.getElementById('aanvullende_acties');
+    const marker = `[V${idx+1}]`;
+    const lines = textarea.value.split('\n').filter(l => !l.startsWith(marker));
+    lines.push(`${marker} ${checkItem.verbeteractie}`);
+    textarea.value = lines.filter(Boolean).join('\n');
+
+    // Voeg deadline-datumveld toe onder de checklist-vraag
+    const deadlineBlock = document.createElement('div');
+    deadlineBlock.id = `deadline-block-${idx}`;
+    deadlineBlock.style.cssText = 'padding:10px 16px 12px;background:#FFF4E0;border-top:1px solid #F0D080;';
+    deadlineBlock.innerHTML = `
+      <label style="font-size:12px;font-weight:600;color:#C97A00;display:block;margin-bottom:6px;">⚠ Verbeteractie — Deadline verplicht invullen:</label>
+      <input type="date" id="deadline-${idx}"
+        style="font-family:inherit;font-size:13px;padding:7px 12px;border:1.5px solid #C97A00;border-radius:6px;background:white;color:#1C1C3A;outline:none;"
+        onchange="updateDeadlineInText(${idx})">
+    `;
+    item.appendChild(deadlineBlock);
+
+  } else if (checkItem.verbeteractie) {
+    // Antwoord is positief — verwijder verbeteractie uit tekstvak
+    const textarea = document.getElementById('aanvullende_acties');
+    const marker = `[V${idx+1}]`;
+    const lines = textarea.value.split('\n').filter(l => !l.startsWith(marker));
+    textarea.value = lines.filter(Boolean).join('\n');
+  }
+}
+
+function updateDeadlineInText(idx) {
+  const deadline = document.getElementById(`deadline-${idx}`)?.value;
+  if (!deadline) return;
+  const textarea = document.getElementById('aanvullende_acties');
+  const marker = `[V${idx+1}]`;
+  const checkItem = CHECKLIST[idx];
+  const lines = textarea.value.split('\n').filter(l => !l.startsWith(marker));
+  lines.push(`${marker} ${checkItem.verbeteractie} Deadline: ${deadline}`);
+  textarea.value = lines.filter(Boolean).join('\n');
 }
 
 // ---- QUALITY ----
