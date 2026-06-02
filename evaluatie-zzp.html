@@ -778,7 +778,7 @@
         <p style="color:rgba(255,255,255,0.5); font-size:11px; margin-bottom:16px; font-style:italic;">Bestandsnaam: <span id="sp-filename"></span></p>
         <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
           <button class="btn btn-primary" id="btn-upload" onclick="uploadToSharePoint()">☁ Opslaan in SharePoint</button>
-          <button class="btn" style="background:rgba(255,255,255,0.12); color:white; border:1px solid rgba(255,255,255,0.2);" onclick="window.print()">🖨 Afdrukken als PDF</button>
+          <button class="btn" style="background:rgba(255,255,255,0.12); color:white; border:1px solid rgba(255,255,255,0.2);" onclick="printSummary()">🖨 Afdrukken als PDF</button>
         </div>
         <div id="sp-status" style="margin-top:14px; font-size:13px; display:none;"></div>
       </div>
@@ -1098,30 +1098,25 @@ async function uploadToSharePoint() {
   showStatus('loading', '⏳ Bezig met uploaden naar SharePoint...');
 
   try {
-    // Token ophalen
     const tokenResp = await msalInstance.acquireTokenSilent({
       scopes: ['Files.ReadWrite.All', 'Sites.ReadWrite.All'],
       account: msalAccount
     });
     const token = tokenResp.accessToken;
 
-    // HTML van de pagina als bestand
-    const html = document.documentElement.outerHTML;
-    const blob = new Blob([html], { type: 'text/html' });
     const naam = document.getElementById('bedrijfsnaam')?.value || 'Onbekend';
     const datum = document.getElementById('datum_evaluatie')?.value || new Date().toISOString().split('T')[0];
     const filename = `Leveranciersevaluatie_ZZP_${naam.replace(/[^a-zA-Z0-9_\-]/g,'_')}_${datum}.html`;
 
-    // Upload direct via drive ID
+    const html = generateSummaryHTML();
+    const blob = new Blob([html], { type: 'text/html' });
+
     const folderPath = ROLE_PATHS[selectedRole];
     const uploadUrl = `https://graph.microsoft.com/v1.0/drives/${SHAREPOINT_DRIVE_ID}/root:${folderPath}/${encodeURIComponent(filename)}:/content`;
 
     const uploadResp = await fetch(uploadUrl, {
       method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'text/html'
-      },
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'text/html' },
       body: blob
     });
 
@@ -1138,6 +1133,188 @@ async function uploadToSharePoint() {
     console.error(err);
     showStatus('error', `❌ Upload mislukt: ${err.message}. Probeer het opnieuw of sla op via Afdrukken als PDF.`);
   }
+}
+
+function generateSummaryHTML() {
+  // Verzamel alle ingevulde data
+  const bedrijfsnaam = document.getElementById('bedrijfsnaam')?.value || '';
+  const naam_ot = document.getElementById('naam_opdrachtnemer')?.value || '';
+  const datum_eval = document.getElementById('datum_evaluatie')?.value || '';
+  const naam_lead = document.getElementById('naam_lead')?.value || '';
+  const inkoop_vorig = document.getElementById('inkoop_vorig')?.value || '';
+  const inkoop_huidig = document.getElementById('inkoop_huidig')?.value || '';
+  const startdatum = document.getElementById('startdatum')?.value || '';
+  const inzetbaarheid = document.getElementById('inzetbaarheid_notities')?.value || '';
+  const aanvullende = document.getElementById('aanvullende_acties')?.value || '';
+  const afspraken_ja = document.getElementById('afspraken_ja')?.value || '';
+  const deadlines_ja = document.getElementById('deadlines_ja')?.value || '';
+  const afspraken_nee = document.getElementById('afspraken_nee')?.value || '';
+  const deadlines_nee = document.getElementById('deadlines_nee')?.value || '';
+  const bav_opmerkingen = document.getElementById('bav_opmerkingen')?.value || '';
+  const sig_naam_ot = document.getElementById('sig_naam_ot')?.value || '';
+  const sig_naam_og = document.getElementById('sig_naam_og')?.value || '';
+  const sig_bedrijf = document.getElementById('sig_bedrijf_ot')?.value || '';
+  const sig_datum = document.getElementById('sig_datum')?.value || '';
+  const periode_van = document.getElementById('periode_van')?.value || '';
+  const periode_tot = document.getElementById('periode_tot')?.value || '';
+
+  // Handtekeningen als afbeelding
+  const sig1 = document.getElementById('sig-opdrachtnemer')?.toDataURL() || '';
+  const sig2 = document.getElementById('sig-opdrachtgever')?.toDataURL() || '';
+
+  // Checklist antwoorden
+  const checklistHTML = CHECKLIST.map((item, i) => {
+    const ans = answers[i] || '—';
+    const color = ans === 'ja' || ans === 'zelf' ? '#1A7A4E' : ans === 'nee' || ans === 'verplicht' ? '#CC0000' : '#888';
+    return `<tr>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee;font-size:13px;color:#1C1C3A;">${i+1}. ${item.q}</td>
+      <td style="padding:8px 12px;border-bottom:1px solid #eee;font-weight:700;color:${color};text-transform:capitalize;">${ans}</td>
+    </tr>`;
+  }).join('');
+
+  // Omzettabel
+  const revenueHTML = [0,1,2,3].map(i => {
+    const n = document.getElementById(`r${i}_name`)?.value || '';
+    const p = document.getElementById(`r${i}_pct`)?.value || '';
+    return n || p ? `<tr><td style="padding:6px 12px;border-bottom:1px solid #eee;font-size:13px;">${n}</td><td style="padding:6px 12px;border-bottom:1px solid #eee;font-size:13px;font-weight:600;">${p}%</td></tr>` : '';
+  }).join('');
+
+  const rolLabel = ROLE_LABELS[selectedRole] || selectedRole;
+  const kwaliteit = qualityAnswer || '—';
+  const bavStatus = bavAnswer === 'ja' ? '✅ Aangeleverd' : bavAnswer === 'nee' ? '❌ Niet aangeleverd' : '—';
+
+  return `<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>Leveranciersevaluatie ZZP — ${bedrijfsnaam}</title>
+<style>
+  body { font-family: Arial, sans-serif; color: #1C1C3A; margin: 0; padding: 0; background: white; }
+  .header { background: #1C1C3A; color: white; padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; }
+  .header h1 { font-size: 20px; margin: 0; }
+  .header-meta { font-size: 12px; opacity: 0.7; text-align: right; }
+  .red-bar { background: #CC0000; height: 4px; }
+  .content { padding: 32px 40px; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #CC0000; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid #CC0000; }
+  .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .meta-item label { font-size: 11px; color: #888; display: block; margin-bottom: 2px; }
+  .meta-item span { font-size: 14px; font-weight: 500; }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #1C1C3A; color: white; padding: 8px 12px; font-size: 12px; text-align: left; }
+  .sig-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 8px; }
+  .sig-box { border: 1px solid #ddd; border-radius: 8px; padding: 12px; text-align: center; }
+  .sig-box label { font-size: 11px; color: #888; display: block; margin-bottom: 8px; }
+  .sig-box img { max-width: 100%; height: 80px; }
+  .sig-name { font-size: 13px; font-weight: 600; margin-top: 8px; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 12px; font-weight: 700; }
+  .badge-green { background: #E6F5EE; color: #1A7A4E; }
+  .badge-red { background: #FFF0F0; color: #CC0000; }
+  .badge-amber { background: #FFF4E0; color: #C97A00; }
+  .notes { background: #F5F5F7; border-radius: 6px; padding: 10px 14px; font-size: 13px; min-height: 40px; }
+  .footer { margin-top: 40px; padding: 16px 40px; border-top: 1px solid #eee; font-size: 11px; color: #888; text-align: center; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div style="font-size:11px;opacity:0.6;margin-bottom:4px;">MIND WORK PRODUCTIONS</div>
+    <h1>Leveranciersevaluatie ZZP</h1>
+    <div style="font-size:12px;opacity:0.7;margin-top:4px;">Rol: ${rolLabel}</div>
+  </div>
+  <div class="header-meta">
+    <div>${bedrijfsnaam}</div>
+    <div>${datum_eval}</div>
+    <div>Lead: ${naam_lead}</div>
+  </div>
+</div>
+<div class="red-bar"></div>
+
+<div class="content">
+
+  <div class="section">
+    <div class="section-title">1. Basisgegevens</div>
+    <div class="meta-grid">
+      <div class="meta-item"><label>Bedrijfsnaam zzp'er</label><span>${bedrijfsnaam}</span></div>
+      <div class="meta-item"><label>Naam opdrachtnemer</label><span>${naam_ot}</span></div>
+      <div class="meta-item"><label>Datum evaluatie</label><span>${datum_eval}</span></div>
+      <div class="meta-item"><label>Lead (opdrachtgever)</label><span>${naam_lead}</span></div>
+      <div class="meta-item"><label>Startdatum samenwerking</label><span>${startdatum}</span></div>
+      <div class="meta-item"><label>Inkoop vorig jaar</label><span>€ ${inkoop_vorig}</span></div>
+      <div class="meta-item"><label>Inkoop huidig jaar t/m nu</label><span>€ ${inkoop_huidig}</span></div>
+    </div>
+  </div>
+
+  ${inzetbaarheid ? `<div class="section">
+    <div class="section-title">2. Inhoudelijke inzetbaarheid</div>
+    <div class="notes">${inzetbaarheid}</div>
+  </div>` : ''}
+
+  <div class="section">
+    <div class="section-title">3. Wet DBA Checklist</div>
+    <table>
+      <thead><tr><th>Vraag</th><th style="width:100px;">Antwoord</th></tr></thead>
+      <tbody>${checklistHTML}</tbody>
+    </table>
+    ${aanvullende ? `<div style="margin-top:12px;"><div style="font-size:12px;font-weight:600;margin-bottom:4px;">Aanvullende acties</div><div class="notes">${aanvullende}</div></div>` : ''}
+  </div>
+
+  <div class="section">
+    <div class="section-title">4. Kwaliteitsevaluatie</div>
+    <div style="margin-bottom:12px;"><label style="font-size:12px;color:#888;">Samenwerking voortzetten?</label>
+    <span class="badge ${kwaliteit === 'ja' ? 'badge-green' : kwaliteit === 'nee' ? 'badge-red' : 'badge-amber'}">${kwaliteit.toUpperCase()}</span></div>
+    ${afspraken_ja ? `<div style="margin-bottom:8px;"><div style="font-size:12px;font-weight:600;margin-bottom:4px;">Afspraken & acties</div><div class="notes">${afspraken_ja}</div></div>` : ''}
+    ${deadlines_ja ? `<div style="margin-bottom:8px;"><div style="font-size:12px;font-weight:600;margin-bottom:4px;">Tijdslijn / deadlines</div><div class="notes">${deadlines_ja}</div></div>` : ''}
+    ${afspraken_nee ? `<div style="margin-bottom:8px;"><div style="font-size:12px;font-weight:600;margin-bottom:4px;">Verbeteracties</div><div class="notes">${afspraken_nee}</div></div>` : ''}
+    ${deadlines_nee ? `<div style="margin-bottom:8px;"><div style="font-size:12px;font-weight:600;margin-bottom:4px;">Deadlines verbetertraject</div><div class="notes">${deadlines_nee}</div></div>` : ''}
+  </div>
+
+  <div class="section">
+    <div class="section-title">Bijlage 1 — Omzetverdeling</div>
+    <div style="font-size:12px;color:#888;margin-bottom:8px;">Periode: ${periode_van} t/m ${periode_tot}</div>
+    <table>
+      <thead><tr><th>Opdrachtgever</th><th style="width:120px;">% Omzet</th></tr></thead>
+      <tbody>${revenueHTML}</tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Bijlage 2 — Beroepsaansprakelijkheidsverzekering</div>
+    <span class="badge ${bavAnswer === 'ja' ? 'badge-green' : 'badge-red'}">${bavStatus}</span>
+    ${bav_opmerkingen ? `<div style="margin-top:8px;" class="notes">${bav_opmerkingen}</div>` : ''}
+  </div>
+
+  <div class="section">
+    <div class="section-title">Ondertekening</div>
+    <div class="sig-row">
+      <div class="sig-box">
+        <label>Handtekening opdrachtnemer</label>
+        <img src="${sig1}" alt="handtekening">
+        <div class="sig-name">${sig_naam_ot}</div>
+        <div style="font-size:11px;color:#888;">${sig_bedrijf}</div>
+      </div>
+      <div class="sig-box">
+        <label>Handtekening vertegenwoordiger opdrachtgever</label>
+        <img src="${sig2}" alt="handtekening">
+        <div class="sig-name">${sig_naam_og}</div>
+        <div style="font-size:11px;color:#888;">Mind Work Productions</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;font-size:13px;color:#888;">Datum ondertekening: <strong>${sig_datum}</strong></div>
+  </div>
+
+</div>
+<div class="footer">Mind Work Productions BV | Haarlemmerweg 317F, 1051 LG Amsterdam | Classificatie: Intern | Versie 1.0</div>
+</body>
+</html>`;
+}
+
+function printSummary() {
+  const html = generateSummaryHTML();
+  const win = window.open('', '_blank');
+  win.document.write(html);
+  win.document.close();
+  win.print();
 }
 
 function showStatus(type, html) {
