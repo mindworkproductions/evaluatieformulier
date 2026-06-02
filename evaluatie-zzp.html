@@ -550,40 +550,14 @@
     </div>
 
     <div class="nav-footer">
-      <div class="step-indicator">Stap 1 van 5</div>
-      <button class="btn btn-primary" onclick="goTo(1)">Volgende →</button>
+      <div class="step-indicator">Stap 1 van 4</div>
+      <button class="btn btn-primary" onclick="validateAndGo(1)">Volgende →</button>
     </div>
   </div>
 
-  <!-- SECTION 1: Inhoudelijke inzetbaarheid -->
+  <!-- SECTION 1: Samenwerkingsvorm checklist -->
   <div class="form-section" data-section="1">
-    <div class="section-eyebrow">Stap 2 — Inzetbaarheid</div>
-    <div class="section-title">Inhoudelijke inzetbaarheid</div>
-    <div class="section-subtitle"><em>Alleen invullen als de opdrachtnemer een opdracht uitvoert als trainer of change agent.</em></div>
-
-    <div class="info-box">
-      <strong>Actie vereist:</strong> Op welke facetten van de diamant is de zzp'er inzetbaar en op welk niveau? Vul dit apart in via het PowerPoint-document:<br><br>
-      <a href="https://mwp.sharepoint.com/:p:/s/mwp/EUvw_eFMJlFHqhltcUsF7gMBXK3CnK3WJ9Cdb2P-grvkOg?e=WipRPb" target="_blank" style="color: var(--red); font-weight: 600;">📊 Inzetbaarheid Facilitators — Diamant (SharePoint)</a>
-    </div>
-
-    <div class="card">
-      <div class="card-label">Notities inzetbaarheid</div>
-      <div class="field field-group single">
-        <label>Aanvullende opmerkingen over inzetbaarheid (optioneel)</label>
-        <textarea id="inzetbaarheid_notities" placeholder="Bijv. sterk op faciliteren, minder op methodisch ontwerpen..."></textarea>
-      </div>
-    </div>
-
-    <div class="nav-footer">
-      <button class="btn btn-secondary" onclick="goTo(0)">← Terug</button>
-      <div class="step-indicator">Stap 2 van 5</div>
-      <button class="btn btn-primary" onclick="goTo(2)">Volgende →</button>
-    </div>
-  </div>
-
-  <!-- SECTION 2: Samenwerkingsvorm checklist -->
-  <div class="form-section" data-section="2">
-    <div class="section-eyebrow">Stap 3 — Wet DBA Checklist</div>
+    <div class="section-eyebrow">Stap 2 — Wet DBA Checklist</div>
     <div class="section-title">Evaluatie samenwerkingsvorm</div>
     <div class="section-subtitle">Beantwoord elke vraag door op Ja of Nee te klikken. De uitleg per vraag helpt je het juiste antwoord te bepalen.</div>
 
@@ -598,15 +572,15 @@
     </div>
 
     <div class="nav-footer">
-      <button class="btn btn-secondary" onclick="goTo(1)">← Terug</button>
-      <div class="step-indicator">Stap 3 van 5</div>
-      <button class="btn btn-primary" onclick="goTo(3)">Volgende →</button>
+      <button class="btn btn-secondary" onclick="goTo(0)">← Terug</button>
+      <div class="step-indicator">Stap 2 van 4</div>
+      <button class="btn btn-primary" onclick="validateAndGo(2)">Volgende →</button>
     </div>
   </div>
 
   <!-- SECTION 3: Samenwerking & bijlagen -->
-  <div class="form-section" data-section="3">
-    <div class="section-eyebrow">Stap 4 — Kwaliteitsevaluatie & Bijlagen</div>
+  <div class="form-section" data-section="2">
+    <div class="section-eyebrow">Stap 3 — Kwaliteitsevaluatie & BAV</div>
     <div class="section-title">Evaluatie samenwerking</div>
     <div class="section-subtitle">Bespreek de kwaliteit van de samenwerking en vul de verplichte bijlagen in.</div>
 
@@ -650,48 +624,10 @@
       </div>
     </div>
 
-    <!-- Bijlage 1 -->
+    <!-- Bijlage BAV -->
     <div class="card">
       <div class="card-label" style="display:flex;align-items:center;gap:8px;">
-        <span style="background:var(--red);color:white;border-radius:4px;padding:2px 8px;font-size:11px;">BIJLAGE 1</span>
-        Omzetverdeling (hygiënefactor — 2x per jaar)
-      </div>
-      <p style="font-size:13px; color:var(--mid); margin-bottom:16px; line-height:1.5;">Vul de omzetverdeling in percentages in. Geen bedragen nodig. MWP/MWI mag niet meer dan 70% vertegenwoordigen.</p>
-
-      <div class="field-group" style="grid-template-columns:1fr 1fr; margin-bottom:12px;">
-        <div class="field">
-          <label>Periode van</label>
-          <input type="date" id="periode_van">
-        </div>
-        <div class="field">
-          <label>Periode tot</label>
-          <input type="date" id="periode_tot">
-        </div>
-      </div>
-
-      <table class="revenue-table">
-        <thead><tr><th>Opdrachtgever</th><th style="width:120px;">% Omzet</th></tr></thead>
-        <tbody id="revenue-rows">
-          <tr><td><input type="text" value="MWP / MWI (wij)" id="r0_name"></td><td><input type="number" id="r0_pct" placeholder="%" min="0" max="100" oninput="updateTotal()"></td></tr>
-          <tr><td><input type="text" placeholder="Opdrachtgever B" id="r1_name"></td><td><input type="number" id="r1_pct" placeholder="%" min="0" max="100" oninput="updateTotal()"></td></tr>
-          <tr><td><input type="text" placeholder="Opdrachtgever C" id="r2_name"></td><td><input type="number" id="r2_pct" placeholder="%" min="0" max="100" oninput="updateTotal()"></td></tr>
-          <tr><td><input type="text" placeholder="Overig / diversen" id="r3_name"></td><td><input type="number" id="r3_pct" placeholder="%" min="0" max="100" oninput="updateTotal()"></td></tr>
-        </tbody>
-        <tfoot>
-          <tr>
-            <td style="padding:8px 4px;"><strong style="font-size:13px;">Totaal</strong></td>
-            <td style="padding:8px 4px;"><strong id="total-pct" class="revenue-total">0%</strong></td>
-          </tr>
-        </tfoot>
-      </table>
-      <div id="total-warning" style="display:none; margin-top:8px; font-size:12px; color:var(--red); font-weight:600;">⚠ Totaal is niet 100%. Controleer de invoer.</div>
-      <div id="mwp-warning" style="display:none; margin-top:8px; font-size:12px; color:var(--red); font-weight:600;">⚠ MWP/MWI vertegenwoordigt meer dan 70% — dit is een verbeteractie!</div>
-    </div>
-
-    <!-- Bijlage 2 -->
-    <div class="card">
-      <div class="card-label" style="display:flex;align-items:center;gap:8px;">
-        <span style="background:var(--dark);color:white;border-radius:4px;padding:2px 8px;font-size:11px;">BIJLAGE 2</span>
+        <span style="background:var(--dark);color:white;border-radius:4px;padding:2px 8px;font-size:11px;">BIJLAGE</span>
         Beroepsaansprakelijkheidsverzekering (BAV)
       </div>
       <p style="font-size:13px; color:var(--mid); margin-bottom:14px; line-height:1.5;">Eenmalig aan te leveren door de zzp'er: een kopie of screenshot van de lopende polis. Zorg dat naam verzekeringnemer, verzekeraar en polisnummer zichtbaar zijn.</p>
@@ -711,15 +647,15 @@
     </div>
 
     <div class="nav-footer">
-      <button class="btn btn-secondary" onclick="goTo(2)">← Terug</button>
-      <div class="step-indicator">Stap 4 van 5</div>
-      <button class="btn btn-primary" onclick="goTo(4)">Naar ondertekening →</button>
+      <button class="btn btn-secondary" onclick="goTo(1)">← Terug</button>
+      <div class="step-indicator">Stap 3 van 4</div>
+      <button class="btn btn-primary" onclick="validateAndGo(3)">Naar ondertekening →</button>
     </div>
   </div>
 
   <!-- SECTION 4: Ondertekening -->
-  <div class="form-section" data-section="4">
-    <div class="section-eyebrow">Stap 5 — Ondertekening</div>
+  <div class="form-section" data-section="3">
+    <div class="section-eyebrow">Stap 4 — Ondertekening</div>
     <div class="section-title">Ondertekening</div>
     <div class="section-subtitle">Beide partijen ondertekenen het formulier hieronder. Sla het daarna op als PDF via de printknop.</div>
 
@@ -790,8 +726,8 @@
     </div>
 
     <div class="nav-footer">
-      <button class="btn btn-secondary" onclick="goTo(3)">← Terug</button>
-      <div class="step-indicator">Stap 5 van 5 — Klaar!</div>
+      <button class="btn btn-secondary" onclick="goTo(2)">← Terug</button>
+      <div class="step-indicator">Stap 4 van 4 — Klaar!</div>
       <div></div>
     </div>
   </div>
@@ -802,31 +738,26 @@
 // ---- DATA ----
 const SECTIONS = [
   "Basisgegevens",
-  "Inzetbaarheid",
   "Wet DBA Checklist",
-  "Samenwerking & Bijlagen",
+  "Samenwerking & BAV",
   "Ondertekening"
 ];
 
 const CHECKLIST = [
   { q: "Werkt de zzp'er exclusief voor MWP/MWI?", hint: "Gewenst antwoord: NEE. Exclusiviteit wijst op een arbeidsrelatie.", wantNee: true, hasZelf: false },
-  { q: "Voldoet de zzp'er aan de 70%-norm met andere opdrachtgevers?", hint: "Gewenst antwoord: JA. Zie Bijlage 1 voor bewijsvoering.", wantJa: true, hasZelf: false },
-  { q: "Heeft de zzp'er op eigen kosten trainingen/cursussen gevolgd?", hint: "Gewenst antwoord: JA. We verrekenen dit in het tarief via de hoofdovereenkomst.", wantJa: true, hasZelf: false },
-  { q: "Heeft de zzp'er trainingen/cursussen via MWP gevolgd (op kosten MWP)?", hint: "Gewenst antwoord: NEE. Kosten worden verrekend via tarief.", wantNee: true, hasZelf: false },
-  { q: "Was er voldoende vrijheid bij de uitvoering van de trainingen (inhoud & werkwijze)?", hint: "Gewenst antwoord: JA. Geen aanwijzingsbevoegdheid van MWP.", wantJa: true, hasZelf: false },
-  { q: "Heeft de zzp'er een opdracht laten uitvoeren door een ander (vervanging)?", hint: "Gewenst antwoord: JA. Dit bewijst zelfstandigheid — de zzp'er regelt zelf vervanging.", wantJa: true, hasZelf: false },
-  { q: "Was deze vervanger zelf gekozen of door MWP aangedragen?", hint: "Gewenst antwoord: ZELF. Zzp'ers moeten zelf vervanging regelen.", options: ['Zelf', 'Verplicht'], hasZelf: true },
+  { q: "Voldoet de zzp'er aan de 70%-norm met andere opdrachtgevers?", hint: "Gewenst antwoord: JA. Bewijsvoering via separate bijlage omzetverdeling.", wantJa: true, hasZelf: false },
+  { q: "Was er voldoende vrijheid bij de uitvoering van de opdracht (inhoud & werkwijze)?", hint: "Gewenst antwoord: JA. Geen aanwijzingsbevoegdheid van MWP.", wantJa: true, hasZelf: false },
+  { q: "Heeft de zzp'er een opdracht laten uitvoeren door een ander (vervanging)?", hint: "Gewenst antwoord: JA. Dit bewijst zelfstandigheid.", wantJa: true, hasZelf: false },
+  { q: "Was deze vervanger zelf gekozen of door MWP aangedragen?", hint: "Gewenst antwoord: ZELF.", options: ['Zelf', 'Verplicht'], hasZelf: true },
   { q: "Is er onderhandeld over het tarief?", hint: "Gewenst antwoord: JA. Vastgelegd via de hoofdovereenkomst.", wantJa: true, hasZelf: false },
-  { q: "Zijn er andere kosten door MWP gefinancierd?", hint: "Gewenst antwoord: NEE. Zzp'ers betalen dit via de hoofdovereenkomst.", wantNee: true, hasZelf: false },
   { q: "Heeft de zzp'er acquisitieactiviteiten uitgevoerd afgelopen jaar?", hint: "Gewenst antwoord: JA. Indien NEE: opnemen als verbeteractie.", wantJa: true, hasZelf: false },
   { q: "Heeft de zzp'er zakelijke investeringen gedaan afgelopen jaar?", hint: "Gewenst antwoord: JA. Telefoon, laptop, website, etc.", wantJa: true, hasZelf: false },
-  { q: "Maakt de zzp'er gebruik van fiscale ondernemersfaciliteiten (zoals startersaftrek)?", hint: "Gewenst antwoord: JA. Vanzelfsprekend als zzp'er.", wantJa: true, hasZelf: false },
+  { q: "Maakt de zzp'er gebruik van fiscale ondernemersfaciliteiten?", hint: "Gewenst antwoord: JA. Vanzelfsprekend als zzp'er.", wantJa: true, hasZelf: false },
   { q: "Wordt het inkomen aangemerkt als winst uit onderneming?", hint: "Gewenst antwoord: JA. Standaard als zzp'er.", wantJa: true, hasZelf: false },
+  { q: "Is de zzp'er ingeschreven bij de Kamer van Koophandel?", hint: "Gewenst antwoord: JA. Basishygiëne.", wantJa: true, hasZelf: false },
   { q: "Heeft de zzp'er een eigen website?", hint: "Gewenst antwoord: JA. Indien NEE: verbeteractie.", wantJa: true, hasZelf: false },
   { q: "Heeft de zzp'er een eigen logo?", hint: "Gewenst antwoord: JA. Indien NEE: verbeteractie.", wantJa: true, hasZelf: false },
-  { q: "Is de zzp'er nog ingeschreven bij de Kamer van Koophandel?", hint: "Gewenst antwoord: JA. Basishygiëne.", wantJa: true, hasZelf: false },
-  { q: "Heeft de zzp'er een beroepsaansprakelijkheidsverzekering (BAV)?", hint: "Gewenst antwoord: JA. Zie Bijlage 2 voor kopie polis. Indien NEE: verbeteractie.", wantJa: true, hasZelf: false },
-  { q: "Is een structurele verificatie externe omzet middels bewijs aangeleverd?", hint: "Gewenst antwoord: JA. Zie Bijlage 1. Tweemaal per jaar controleren.", wantJa: true, hasZelf: false },
+  { q: "Heeft de zzp'er een lopende beroepsaansprakelijkheidsverzekering (BAV)?", hint: "Gewenst antwoord: JA. Kopie polis aanleveren. Indien NEE: verbeteractie.", wantJa: true, hasZelf: false },
 ];
 
 let answers = {};
@@ -875,7 +806,58 @@ function updateProgress(idx) {
   document.getElementById('progressLabel').textContent = `Stap ${idx + 1} van ${SECTIONS.length} — ${SECTIONS[idx]}`;
 }
 
-function goTo(idx) {
+function validateAndGo(targetSection) {
+  const current = currentSection;
+  let errors = [];
+
+  if (current === 0) {
+    // Stap 1: Basisgegevens
+    if (!selectedRole) errors.push('Selecteer een rol (Change Agent, Trainer of Projectmanager)');
+    if (!document.getElementById('bedrijfsnaam')?.value.trim()) errors.push('Vul de bedrijfsnaam in');
+    if (!document.getElementById('naam_opdrachtnemer')?.value.trim()) errors.push('Vul de naam van de opdrachtnemer in');
+    if (!document.getElementById('datum_evaluatie')?.value) errors.push('Vul de datum van de evaluatie in');
+    if (!document.getElementById('naam_lead')?.value.trim()) errors.push('Vul de naam van de lead in');
+    if (!document.getElementById('inkoop_vorig')?.value) errors.push('Vul de totale inkoop vorig jaar in');
+    if (!document.getElementById('inkoop_huidig')?.value) errors.push('Vul de totale inkoop huidig jaar in');
+    if (!document.getElementById('startdatum')?.value) errors.push('Vul de startdatum van de samenwerking in');
+  }
+
+  if (current === 1) {
+    // Stap 2: Checklist — alle vragen beantwoord?
+    const unanswered = CHECKLIST.map((_, i) => i).filter(i => !answers[i]);
+    if (unanswered.length > 0) errors.push(`Beantwoord alle vragen in de checklist (${unanswered.length} nog open)`);
+  }
+
+  if (current === 2) {
+    // Stap 3: Kwaliteitsevaluatie + BAV
+    if (!qualityAnswer) errors.push('Geef aan of de samenwerking wordt voortgezet');
+    if (!bavAnswer) errors.push('Geef aan of de BAV is aangeleverd');
+  }
+
+  if (errors.length > 0) {
+    // Toon foutmelding
+    let existing = document.getElementById('validation-error');
+    if (!existing) {
+      existing = document.createElement('div');
+      existing.id = 'validation-error';
+      existing.style.cssText = 'background:#FFF0F0;border:1.5px solid #CC0000;border-radius:10px;padding:14px 18px;margin-top:16px;font-size:13px;color:#CC0000;';
+      const navFooter = document.querySelectorAll('.form-section')[current].querySelector('.nav-footer');
+      navFooter.parentNode.insertBefore(existing, navFooter);
+    }
+    existing.innerHTML = '<strong>Vul eerst de verplichte velden in:</strong><ul style="margin-top:8px;padding-left:18px;">' +
+      errors.map(e => `<li style="margin-bottom:4px;">${e}</li>`).join('') + '</ul>';
+    existing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  // Verwijder eventuele foutmelding
+  const existing = document.getElementById('validation-error');
+  if (existing) existing.remove();
+
+  goTo(targetSection);
+}
+
+
   document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.form-section')[idx].classList.add('active');
   currentSection = idx;
@@ -1011,9 +993,9 @@ const SHAREPOINT_SITE = 'mwp.sharepoint.com';
 const SHAREPOINT_SITE_PATH = '/sites/office';
 const SHAREPOINT_DRIVE_ID = 'b!bpoBPULg1Eq0f9QTuBqGRbQeGYAw7PJPiBqQGhb4BreylnPqxnhVTpD1_V20hGLY';
 const ROLE_PATHS = {
-  change_agent:   '/06 People/04. MWAcademy/05. Evaluaties Leveranciers/1. Change Agents/2026',
-  trainer:        '/06 People/04. MWAcademy/05. Evaluaties Leveranciers/2. Trainers/2026',
-  projectmanager: '/06 People/04. MWAcademy/05. Evaluaties Leveranciers/3. Projectmanagers/2026'
+  change_agent:   '/06 People/04. MWAcademy/05. Evaluaties Leveranciers/1. Change Agents/2027  februari',
+  trainer:        '/06 People/04. MWAcademy/05. Evaluaties Leveranciers/2. Trainers/2027 februari',
+  projectmanager: '/06 People/04. MWAcademy/05. Evaluaties Leveranciers/3. Projectmanagers/2027  februari'
 };
 const ROLE_LABELS = {
   change_agent: 'Change Agents / 2026',
@@ -1155,8 +1137,6 @@ function generateSummaryHTML() {
   const sig_naam_og = document.getElementById('sig_naam_og')?.value || '';
   const sig_bedrijf = document.getElementById('sig_bedrijf_ot')?.value || '';
   const sig_datum = document.getElementById('sig_datum')?.value || '';
-  const periode_van = document.getElementById('periode_van')?.value || '';
-  const periode_tot = document.getElementById('periode_tot')?.value || '';
 
   // Handtekeningen als afbeelding
   const sig1 = document.getElementById('sig-opdrachtnemer')?.toDataURL() || '';
@@ -1268,31 +1248,6 @@ function generateSummaryHTML() {
     ${afspraken_nee ? `<div style="margin-bottom:8px;"><div style="font-size:12px;font-weight:600;margin-bottom:4px;">Verbeteracties</div><div class="notes">${afspraken_nee}</div></div>` : ''}
     ${deadlines_nee ? `<div style="margin-bottom:8px;"><div style="font-size:12px;font-weight:600;margin-bottom:4px;">Deadlines verbetertraject</div><div class="notes">${deadlines_nee}</div></div>` : ''}
   </div>
-
-  <div class="section">
-    <div class="section-title">Bijlage 1 — Omzetverdeling</div>
-    <div style="font-size:12px;color:#888;margin-bottom:8px;">Periode: ${periode_van} t/m ${periode_tot}</div>
-    <table>
-      <thead><tr><th>Opdrachtgever</th><th style="width:120px;">% Omzet</th></tr></thead>
-      <tbody>${revenueHTML}</tbody>
-    </table>
-  </div>
-
-  <div class="section">
-    <div class="section-title">Bijlage 2 — Beroepsaansprakelijkheidsverzekering</div>
-    <span class="badge ${bavAnswer === 'ja' ? 'badge-green' : 'badge-red'}">${bavStatus}</span>
-    ${bav_opmerkingen ? `<div style="margin-top:8px;" class="notes">${bav_opmerkingen}</div>` : ''}
-  </div>
-
-  <div class="section">
-    <div class="section-title">Ondertekening</div>
-    <div class="sig-row">
-      <div class="sig-box">
-        <label>Handtekening opdrachtnemer</label>
-        <img src="${sig1}" alt="handtekening">
-        <div class="sig-name">${sig_naam_ot}</div>
-        <div style="font-size:11px;color:#888;">${sig_bedrijf}</div>
-      </div>
       <div class="sig-box">
         <label>Handtekening vertegenwoordiger opdrachtgever</label>
         <img src="${sig2}" alt="handtekening">
