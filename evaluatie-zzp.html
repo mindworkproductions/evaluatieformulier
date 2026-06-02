@@ -1309,6 +1309,16 @@ function generateSummaryHTML() {
     ${afspraken_nee ? `<div style="margin-bottom:8px;"><div style="font-size:12px;font-weight:600;margin-bottom:4px;">Verbeteracties</div><div class="notes">${afspraken_nee}</div></div>` : ''}
     ${deadlines_nee ? `<div style="margin-bottom:8px;"><div style="font-size:12px;font-weight:600;margin-bottom:4px;">Deadlines verbetertraject</div><div class="notes">${deadlines_nee}</div></div>` : ''}
   </div>
+
+  <div class="section">
+    <div class="section-title">Ondertekening</div>
+    <div class="sig-row">
+      <div class="sig-box">
+        <label>Handtekening opdrachtnemer</label>
+        <img src="${sig1}" alt="handtekening">
+        <div class="sig-name">${sig_naam_ot}</div>
+        <div style="font-size:11px;color:#888;">${sig_bedrijf}</div>
+      </div>
       <div class="sig-box">
         <label>Handtekening vertegenwoordiger opdrachtgever</label>
         <img src="${sig2}" alt="handtekening">
