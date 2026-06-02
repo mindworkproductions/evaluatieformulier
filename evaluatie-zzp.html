@@ -1195,6 +1195,8 @@ function generateSummaryHTML() {
   const naam_lead = document.getElementById('naam_lead')?.value || '';
   const inkoop_vorig = document.getElementById('inkoop_vorig')?.value || '';
   const inkoop_huidig = document.getElementById('inkoop_huidig')?.value || '';
+  const uren_jaar = document.getElementById('uren_jaar')?.value || '';
+  const uren_per_week = uren_jaar ? (parseFloat(uren_jaar) / 46).toFixed(1) : '—';
   const startdatum = document.getElementById('startdatum')?.value || '';
   const inzetbaarheid = document.getElementById('inzetbaarheid_notities')?.value || '';
   const aanvullende = document.getElementById('aanvullende_acties')?.value || '';
@@ -1292,6 +1294,7 @@ function generateSummaryHTML() {
       <div class="meta-item"><label>Startdatum samenwerking</label><span>${startdatum}</span></div>
       <div class="meta-item"><label>Inkoop vorig jaar</label><span>€ ${inkoop_vorig}</span></div>
       <div class="meta-item"><label>Inkoop huidig jaar t/m nu</label><span>€ ${inkoop_huidig}</span></div>
+      <div class="meta-item"><label>Gewerkte uren afgelopen jaar</label><span>${uren_jaar} uur (≈ ${uren_per_week} uur/week)</span></div>
     </div>
   </div>
 
@@ -1317,6 +1320,12 @@ function generateSummaryHTML() {
     ${deadlines_ja ? `<div style="margin-bottom:8px;"><div style="font-size:12px;font-weight:600;margin-bottom:4px;">Tijdslijn / deadlines</div><div class="notes">${deadlines_ja}</div></div>` : ''}
     ${afspraken_nee ? `<div style="margin-bottom:8px;"><div style="font-size:12px;font-weight:600;margin-bottom:4px;">Verbeteracties</div><div class="notes">${afspraken_nee}</div></div>` : ''}
     ${deadlines_nee ? `<div style="margin-bottom:8px;"><div style="font-size:12px;font-weight:600;margin-bottom:4px;">Deadlines verbetertraject</div><div class="notes">${deadlines_nee}</div></div>` : ''}
+  </div>
+
+  <div class="section">
+    <div class="section-title">Bijlage — Beroepsaansprakelijkheidsverzekering (BAV)</div>
+    <span class="badge ${bavAnswer === 'ja' ? 'badge-green' : 'badge-red'}">${bavStatus}</span>
+    ${bav_opmerkingen ? `<div style="margin-top:8px;" class="notes">${bav_opmerkingen}</div>` : ''}
   </div>
 
   <div class="section">
