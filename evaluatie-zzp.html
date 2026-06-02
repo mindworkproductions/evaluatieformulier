@@ -770,6 +770,8 @@ let currentSection = 0;
 let qualityAnswer = null;
 let verbeterAnswer = null;
 let bavAnswer = null;
+let sig1Data = '';
+let sig2Data = '';
 
 // ---- INIT ----
 document.addEventListener('DOMContentLoaded', () => {
@@ -1021,6 +1023,11 @@ function initSignatures() {
       return [(clientX - rect.left) * scaleX, (clientY - rect.top) * scaleY];
     }
 
+    function saveSig() {
+      if (id === 'sig-opdrachtnemer') sig1Data = canvas.toDataURL();
+      else sig2Data = canvas.toDataURL();
+    }
+
     canvas.addEventListener('mousedown', e => { drawing = true; [lastX, lastY] = getPos(e); });
     canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; [lastX, lastY] = getPos(e); }, { passive: false });
     canvas.addEventListener('mousemove', e => {
@@ -1038,15 +1045,17 @@ function initSignatures() {
       ctx.strokeStyle = '#1C1C3A'; ctx.lineWidth = 2; ctx.lineCap = 'round';
       ctx.stroke(); [lastX, lastY] = [x, y];
     }, { passive: false });
-    canvas.addEventListener('mouseup', () => drawing = false);
-    canvas.addEventListener('touchend', () => drawing = false);
-    canvas.addEventListener('mouseleave', () => drawing = false);
+    canvas.addEventListener('mouseup', () => { drawing = false; saveSig(); });
+    canvas.addEventListener('touchend', () => { drawing = false; saveSig(); });
+    canvas.addEventListener('mouseleave', () => { drawing = false; saveSig(); });
   });
 }
 
 function clearSig(id) {
   const canvas = document.getElementById(id);
   canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+  if (id === 'sig-opdrachtnemer') sig1Data = '';
+  else sig2Data = '';
 }
 
 // ---- ROL & SHAREPOINT ----
@@ -1199,9 +1208,9 @@ function generateSummaryHTML() {
   const sig_bedrijf = document.getElementById('sig_bedrijf_ot')?.value || '';
   const sig_datum = document.getElementById('sig_datum')?.value || '';
 
-  // Handtekeningen als afbeelding
-  const sig1 = document.getElementById('sig-opdrachtnemer')?.toDataURL() || '';
-  const sig2 = document.getElementById('sig-opdrachtgever')?.toDataURL() || '';
+  // Handtekeningen als afbeelding — gebruik opgeslagen data
+  const sig1 = sig1Data || '';
+  const sig2 = sig2Data || '';
 
   // Checklist antwoorden
   const checklistHTML = CHECKLIST.map((item, i) => {
