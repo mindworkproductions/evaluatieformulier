@@ -526,23 +526,20 @@
       <div class="card-label">Financiële gegevens (uit control dashboard Workfloor)</div>
       <div class="field-group">
         <div class="field">
-          <label>Totale inkoop vorig jaar (€)</label>
+          <label>Totale inkoop afgelopen jaar 2026 (€)</label>
           <input type="number" id="inkoop_vorig" placeholder="0.00" min="0">
         </div>
-        <div class="field">
-          <label>Totale inkoop huidig jaar t/m nu (€)</label>
-          <input type="number" id="inkoop_huidig" placeholder="0.00" min="0">
-        </div>
-      </div>
-      <div class="field-group">
         <div class="field">
           <label>Gewerkte uren afgelopen jaar (uit Simplicate)</label>
           <input type="number" id="uren_jaar" placeholder="0" min="0">
         </div>
+      </div>
+      <div class="field-group">
         <div class="field">
           <label>Startdatum samenwerking</label>
           <input type="date" id="startdatum">
         </div>
+        <div class="field"></div>
       </div>
       <div style="background: var(--grey); border-radius: 8px; padding: 10px 14px; margin-top: 4px; font-size: 13px; color: var(--mid);">
         Gemiddeld uren/week (berekend): <strong id="uren_per_week">—</strong> <span style="opacity:0.6">(totaal ÷ 46 weken)</span>
@@ -630,7 +627,7 @@
         <span style="background:var(--dark);color:white;border-radius:4px;padding:2px 8px;font-size:11px;">BIJLAGE</span>
         Beroepsaansprakelijkheidsverzekering (BAV)
       </div>
-      <p style="font-size:13px; color:var(--mid); margin-bottom:14px; line-height:1.5;">Eenmalig aan te leveren door de zzp'er: een kopie of screenshot van de lopende polis. Zorg dat naam verzekeringnemer, verzekeraar en polisnummer zichtbaar zijn.</p>
+      <p style="font-size:13px; color:var(--mid); margin-bottom:14px; line-height:1.5;">De BAV wordt eenmalig aangeleverd via <strong>people@mindworkproductions.com</strong>. Alleen bij wijziging van verzekeraar, verlopen polis of andere wijzigingen in de dekking dient een nieuwe kopie aangeleverd te worden.</p>
 
       <div class="quality-options" style="max-width:320px;">
         <button class="quality-btn q-ja" onclick="setBAV('ja', this)">✓ Aangeleverd</button>
@@ -825,7 +822,6 @@ function validateAndGo(targetSection) {
     if (!document.getElementById('datum_evaluatie')?.value) errors.push('Vul de datum van de evaluatie in');
     if (!document.getElementById('naam_lead')?.value.trim()) errors.push('Vul de naam van de lead in');
     if (!document.getElementById('inkoop_vorig')?.value) errors.push('Vul de totale inkoop vorig jaar in');
-    if (!document.getElementById('inkoop_huidig')?.value) errors.push('Vul de totale inkoop huidig jaar in');
     if (!document.getElementById('startdatum')?.value) errors.push('Vul de startdatum van de samenwerking in');
   }
 
@@ -1194,7 +1190,6 @@ function generateSummaryHTML() {
   const datum_eval = document.getElementById('datum_evaluatie')?.value || '';
   const naam_lead = document.getElementById('naam_lead')?.value || '';
   const inkoop_vorig = document.getElementById('inkoop_vorig')?.value || '';
-  const inkoop_huidig = document.getElementById('inkoop_huidig')?.value || '';
   const uren_jaar = document.getElementById('uren_jaar')?.value || '';
   const uren_per_week = uren_jaar ? (parseFloat(uren_jaar) / 46).toFixed(1) : '—';
   const startdatum = document.getElementById('startdatum')?.value || '';
@@ -1292,8 +1287,7 @@ function generateSummaryHTML() {
       <div class="meta-item"><label>Datum evaluatie</label><span>${datum_eval}</span></div>
       <div class="meta-item"><label>Lead (opdrachtgever)</label><span>${naam_lead}</span></div>
       <div class="meta-item"><label>Startdatum samenwerking</label><span>${startdatum}</span></div>
-      <div class="meta-item"><label>Inkoop vorig jaar</label><span>€ ${inkoop_vorig}</span></div>
-      <div class="meta-item"><label>Inkoop huidig jaar t/m nu</label><span>€ ${inkoop_huidig}</span></div>
+      <div class="meta-item"><label>Totale inkoop 2026</label><span>€ ${inkoop_vorig}</span></div>
       <div class="meta-item"><label>Gewerkte uren afgelopen jaar</label><span>${uren_jaar} uur (≈ ${uren_per_week} uur/week)</span></div>
     </div>
   </div>
